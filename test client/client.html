@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+    <head>
+        <meta charset="UTF-8">
+        <meta name="viewport" content="width=device-width, initial-scale=1.0">
+        <title>QR-Code test</title>
+    </head>
+    <body>
+        <div id="formContainer">
+            <label for="in">input:</label>
+            <input type="text" value="Hallo" id="in">
+            <label for="eccLevel">ecc level:</label>
+            <select id="eccLevel">
+                <option value="L">L</option>
+                <option value="M">M</option>
+                <option value="Q">Q</option>
+                <option value="H">H</option>
+            </select>
+            <label for="mask">mask:</label>
+            <select id="mask">
+                <option value="0">0</option>
+                <option value="1">1</option>
+                <option value="2">2</option>
+                <option value="3">3</option>
+                <option value="4">4</option>
+                <option value="5">5</option>
+                <option value="6">6</option>
+                <option value="7">7</option>
+            </select>
+            <button id="generate">Generate</button>
+            <p id="error"></p>
+        </div>
+        <img id="qr" style="border: 1px solid green;"/>
+        <script type="module" src="./build/client/main.js"></script>
+    </body>
+</html>

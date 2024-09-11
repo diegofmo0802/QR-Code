@@ -1,0 +1,19 @@
+{
+    "name": "qr-code.test-client",
+    "version": "1.0.0",
+    "main": "build/server.js",
+    "type": "module",
+    "scripts": {
+        "start": "node build/server.js",
+        "dev": "tsc && npm start"
+    },
+    "keywords": [],
+    "author": "diegofmo0802 <diegofmo0802@gmail.com>",
+    "description": "",
+    "devDependencies": {
+        "typescript": "^5.5.4"
+    },
+    "dependencies": {
+        "saml.servercore": "^3.7.0-Dev.12"
+    }
+}
