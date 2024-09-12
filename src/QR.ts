@@ -24,7 +24,7 @@ export class QR {
      */
     public constructor(
         private readonly content: string,
-        options: QR.options
+        options: QR.options = {}
     ) {
         let { minVersion = 1, eccLevel = 'L', mask = 5, icon = false } = options;
 
