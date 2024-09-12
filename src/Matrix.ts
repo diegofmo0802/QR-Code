@@ -120,7 +120,7 @@ export class Matrix {
      * apply a mask to the matrix
      * @param option the mask to apply
      */
-    public aplyMask(option: Matrix.Mask = 0) {
+    public applyMask(option: Matrix.Mask = 0) {
         option = option in Matrix.MASKS ? option : 0;
         const mask = Matrix.MASKS[option];
         this.drawFormatInfo(this.eccId, option);
@@ -128,11 +128,11 @@ export class Matrix {
             for (let col = 0; col < this.size; col += mask[0].length) {
                 for (let mRow = 0; mRow < mask.length; mRow++) {
                     for (let mCol = 0; mCol < mask[0].length; mCol++) {
-                        const toAplyRow = row + mRow;
-                        const toAplyCol = col + mCol;
-                        if (toAplyRow >= this.size || toAplyCol >= this.size) continue;
-                        if (!this.isReserved(toAplyRow, toAplyCol)) {
-                            this.matrix[toAplyRow][toAplyCol] ^= mask[mRow][mCol];
+                        const toApplyRow = row + mRow;
+                        const toApplyCol = col + mCol;
+                        if (toApplyRow >= this.size || toApplyCol >= this.size) continue;
+                        if (!this.isReserved(toApplyRow, toApplyCol)) {
+                            this.matrix[toApplyRow][toApplyCol] ^= mask[mRow][mCol];
                         }
                     }
                 }
@@ -144,7 +144,7 @@ export class Matrix {
      * @param codedData the data to set
      */
     public setData(codedData: Matrix.Bin[]): void {
-        if (codedData.length > this.maxBitsData) throw new Error(`data too long, permited: ${this.maxBitsData}, provided: ${codedData.length}`);
+        if (codedData.length > this.maxBitsData) throw new Error(`data too long, allowed: ${this.maxBitsData}, provided: ${codedData.length}`);
         let row = this.size - 1;
         let col = this.size - 1;
         let direction: 'up' | 'down' = 'up';

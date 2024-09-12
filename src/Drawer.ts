@@ -12,7 +12,7 @@ export class Drawer {
     /** the calculated margin */
     private _moduleMargin: number = 0;
     /** the margin provided by the user */
-    private _Modulemargin: Drawer.SizeValue = 0;
+    private _ModuleMargin: Drawer.SizeValue = 0;
     /** the background color of the QR code */
     private _backgroundColor: `#${string}` = '#00B4FF';
     /**
@@ -26,7 +26,7 @@ export class Drawer {
     ) {
         this.canvas = document.createElement('canvas');
         const ctx = this.canvas.getContext('2d');
-        if (!ctx) throw new Error('failde to get canvas context');
+        if (!ctx) throw new Error('fail to get canvas context');
         this.ctx = ctx;
         this.canvas.width = imageSize;
         this.canvas.height = imageSize;
@@ -77,10 +77,10 @@ export class Drawer {
         return Math.floor(this.imageSize / this.qr.size);
     }
     /**
-     * Get the exedent of moduleSize floor calculates
-     * @returns Exedent of moduleSize floor calculates
+     * Get the surplus of moduleSize floor calculates
+     * @returns Surplus of moduleSize floor calculates
      */
-    private get moduleExedent(): number {
+    private get moduleSurplus(): number {
         return (this.imageSize % this.qr.size);
     }
     /**
@@ -124,7 +124,7 @@ export class Drawer {
         if (!ctx) throw new Error('no context to draw');
         ctx.imageSmoothingEnabled = false;
         const moduleSize = this.moduleSize;
-        const padding = this.moduleExedent / 2;
+        const padding = this.moduleSurplus / 2;
         const moduleMargin = this.moduleMargin;
         const moduleRadius = this.moduleRadius;
         const pointSize = moduleSize - moduleMargin;
@@ -150,14 +150,14 @@ export class Drawer {
      * @param matrix Matrix to draw
      */
     private async drawMatrix(ctx: CanvasRenderingContext2D, matrix: Matrix): Promise<void> {
-        const increseFactor = 1000;
-        const svgSize = this.moduleSize * this.qr.size * increseFactor;
+        const increaseFactor = 1000;
+        const svgSize = this.moduleSize * this.qr.size * increaseFactor;
         let svgContent = ''
         
-        const moduleSize = this.moduleSize * increseFactor;
+        const moduleSize = this.moduleSize * increaseFactor;
         const padding = 0;
-        const moduleMargin = this.moduleMargin * increseFactor;
-        const moduleRadius = this.moduleRadius * increseFactor;
+        const moduleMargin = this.moduleMargin * increaseFactor;
+        const moduleRadius = this.moduleRadius * increaseFactor;
         const pointSize = moduleSize - moduleMargin;
 
         let posRow = padding;
@@ -173,7 +173,7 @@ export class Drawer {
                     `x="${posCol}" y="${posRow}"`,
                     `width="${pointSize}" height="${pointSize}"`,
                     `rx="${moduleRadius}" ry="${moduleRadius}"`,
-                    `fill="${fillColor}" stroke="${fillColor}" stroke-width="${1 * increseFactor}"`,
+                    `fill="${fillColor}" stroke="${fillColor}" stroke-width="${1 * increaseFactor}"`,
                     '/>'
                 ].join(' ');
                 posCol += moduleSize;
@@ -248,14 +248,14 @@ export class Drawer {
      * @param image Image to draw
      */
     public async drawImage(ctx: CanvasRenderingContext2D, image: string): Promise<void> {
-        const increseFactor = 1000;
+        const increaseFactor = 1000;
         const qrArea = this.qr.QRMatrix.maxBitsData;
         const iconArea = Math.floor(qrArea * 0.15);
         let iconSize = Math.floor(Math.sqrt(iconArea));
         if (iconSize % 2 === 0) iconSize--;
-        iconSize *= this.moduleSize * increseFactor;
-        const svgSize = this.moduleSize * this.qr.size * increseFactor;
-        const border = 1 * increseFactor
+        iconSize *= this.moduleSize * increaseFactor;
+        const svgSize = this.moduleSize * this.qr.size * increaseFactor;
+        const border = 1 * increaseFactor
         const centerOffset = (svgSize / 2) - (iconSize / 2) - (border / 2);
         
         const svg = Drawer.generateSvg(
@@ -306,14 +306,14 @@ export class Drawer {
      * @param reference Reference value
      * @returns Parsed value
      */
-    public static parseValue(value: Drawer.SizeValue, reference: number, maximun?: number): number {
+    public static parseValue(value: Drawer.SizeValue, reference: number, maximum?: number): number {
         if (typeof value === 'string') {
             if (value.endsWith('%')) value = (parseInt(value.slice(0, -1)) / 100) * reference;
             else if (value.endsWith('px')) value = parseInt(value.slice(0, -2));
             else value = parseInt(value);
         }
         if (typeof value !== 'number' || isNaN(value)) return 0;
-        return maximun && value > maximun ? maximun : value;
+        return maximum && value > maximum ? maximum : value;
     }
     public static generateSvg(width: number, height: number, content: string): string {
         const svgNamespace = "http://www.w3.org/2000/svg";
@@ -332,14 +332,14 @@ export class Drawer {
         return svgContent;
     }
     /* PROPERTIES SECTION */
-    /* CALCULO DE PROPIEDADES NUMERICAS */
+    /* CALCULATE NUMERIC PROPERTIES */
     private recalculate(): void {
         this.calculateMargin();
         this.calculateRadius();
     }
     private calculateMargin(): void {
         const maxMargin = this.moduleSize * 0.2;
-        this._moduleMargin = Drawer.parseValue(this._Modulemargin, this.moduleSize, maxMargin);
+        this._moduleMargin = Drawer.parseValue(this._ModuleMargin, this.moduleSize, maxMargin);
     }
     private calculateRadius(): void {
         const maxRadius = this.moduleSize * 0.5;
@@ -363,7 +363,7 @@ export class Drawer {
     /**
      * Set the margin of the module
      * - the max margin is 1/5 of the module size
-     * - if you ecxceed the max margin, the margin will be set to the max margin
+     * - if you surplus the max margin, the margin will be set to the max margin
      * - the margin can be a number or a percentage of the module size
      * - the margin can be a string with a percentage sign
      * @param margin Margin of the module
@@ -372,7 +372,7 @@ export class Drawer {
      * @example qr.moduleMargin = '5%' // margin is 5% of module size
      */
     public set moduleMargin(margin: number | `${number}%`) {
-        this._Modulemargin = margin;
+        this._ModuleMargin = margin;
         this.calculateMargin();
         // this.reDraw();
     }
@@ -388,7 +388,7 @@ export class Drawer {
      * Set the radius of the module
      * @param radius Radius of the module
      * - the max radius is the size of the module divided by 2
-     * - if you ecxceed the max radius, the radius will be set to the max radius
+     * - if you surplus the max radius, the radius will be set to the max radius
      * - the radius can be a number or a percentage of the module size
      * - the radius can be a string with a percentage sign
      * @throws Error if the radius is invalid

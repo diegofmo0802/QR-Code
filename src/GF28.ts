@@ -3,7 +3,7 @@ export class GF28 {
     public static readonly logTable: number[] = new Array(256).fill(0);
     /** Precomputed antilog table for GF(2^8) */
     public static readonly antilogTable: number[] = new Array(256).fill(0);
-    /** Precompute log and antilog tables for GF(2^8) */
+    /** Precomputed log and antilog tables for GF(2^8) */
     static {
         let value = 1;
         for (let i = 0; i < 255; i++) {
@@ -44,9 +44,9 @@ export class GF28 {
         return this.antilogTable[(logDividend - logDivisor + 255) % 255];
     }
     /**
-     * Exponentiate a number in GF(2^8)
-     * @param x Number to exponentiate
-     * @returns Exponentiated number
+     * Exponent a number in GF(2^8)
+     * @param x Number to exponent
+     * @returns result
      */
     public static exp(x: number): number {
         return this.antilogTable[x % 255];

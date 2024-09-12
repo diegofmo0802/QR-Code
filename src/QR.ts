@@ -63,7 +63,7 @@ export class QR {
         const bits = BinString.split('').map(bit => bit === '1' ? 1 : 0);
 
         matrix.setData(bits);
-        matrix.aplyMask(this.mask);
+        matrix.applyMask(this.mask);
         return matrix
     }
     /**

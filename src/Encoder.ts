@@ -97,15 +97,15 @@ export class Encoder {
                 `\nmax length: ${maxDataCapacity}, given length: ${data.length}`
             );
         }
-        let dataEencoded: string;
+        let dataEncoded: string;
         let totalSize: number = 0;
         switch (mode) {
-            case 'numeric': dataEencoded = this.numeric(data); break;
-            case 'alphanumeric': dataEencoded = this.alphanumeric(data); break;
-            case 'binary': dataEencoded = this.binary(data); break;
+            case 'numeric': dataEncoded = this.numeric(data); break;
+            case 'alphanumeric': dataEncoded = this.alphanumeric(data); break;
+            case 'binary': dataEncoded = this.binary(data); break;
             default: throw new Error(`Unsupported mode: ${mode}`);
         }
-        totalSize += dataEencoded.length;
+        totalSize += dataEncoded.length;
 
         const modeIndicator = this.getModeIndicator(mode);
         totalSize += modeIndicator.length;
@@ -119,7 +119,7 @@ export class Encoder {
         totalSize += bytePadding.length;
         const encoded = (
             modeIndicator + Count +
-            dataEencoded + terminator +
+            dataEncoded + terminator +
             bitPadding + bytePadding
         );
         // console.log('encoded', encoded.length / 8, encoded);
@@ -137,7 +137,7 @@ export class Encoder {
 
         // console.log('mode', modeIndicator.length, modeIndicator);
         // console.log('Count', Count.length, Count);
-        // console.log('data', dataEencoded.length, dataEencoded);
+        // console.log('data', dataEncoded.length, dataEncoded);
         // console.log('terminator', terminator.length, terminator);
         // console.log('bit padding', bitPadding.length, bitPadding);
         // console.log('padding', bytePadding.length, bytePadding);
@@ -308,7 +308,7 @@ export class Encoder {
     }
     
     /**
-     * auxiliar method to calculate block sizes
+     * auxiliary method to calculate block sizes
      * @param totalCodewords Total number of codewords
      * @param totalBlocks Total number of blocks
      * @returns Array of block sizes
