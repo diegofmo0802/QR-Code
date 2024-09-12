@@ -371,7 +371,7 @@ export class Drawer {
      * @example qr.moduleMargin = 5; // margin is 5px
      * @example qr.moduleMargin = '5%' // margin is 5% of module size
      */
-    public set moduleMargin(margin: number | `${number}%`) {
+    public set moduleMargin(margin: Drawer.SizeValue) {
         this._ModuleMargin = margin;
         this.calculateMargin();
         // this.reDraw();
@@ -396,7 +396,7 @@ export class Drawer {
      * @example qr.moduleRadius = '5%' // radius is 5% of module size
      * @example qr.moduleRadius = '5px';
      */
-    public set moduleRadius(radius: number | `${number}%`) {
+    public set moduleRadius(radius: Drawer.SizeValue) {
         this._ModuleRadius = radius;
         this.calculateRadius();
         // this.reDraw();
