@@ -167,5 +167,5 @@ export namespace QR {
     );
     export type CorrectionLevel = 'L' | 'M' | 'Q' | 'H';
 }
-export { Matrix, Encoder };
+export { Drawer, Matrix, Encoder };
 export default QR;
