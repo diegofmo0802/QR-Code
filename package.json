@@ -4,7 +4,7 @@
   "main": "build/QR.js",
   "type": "module",
   "scripts": {
-    "test": "cd \"test client\" && npm run dev"
+    "compile-watch": "tsc --watch"
   },
   "keywords": [],
   "author": "diegofmo0802 <diegofmo0802@gmail.com>",

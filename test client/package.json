@@ -5,6 +5,7 @@
     "type": "module",
     "scripts": {
         "start": "node build/server.js",
+        "compile-watch": "tsc --watch",
         "dev": "tsc && npm start"
     },
     "keywords": [],
