@@ -74,9 +74,11 @@ export class Drawer {
      */
     private drawMatrix(matrix: Matrix): string {
         const style = this.style;
-        const svgSize = style.totalSize;
+        const matrixSize = style.matrixSize + (style.padding * 2);
         const pointSize = style.moduleSize - style.moduleMargin;
-        const padding = style.padding + (style.moduleMargin / 2);
+        const padding = style.padding + style.moduleMargin;
+        const margin = style.margin + style.moduleMargin;
+        const sideSkip = padding + margin;
 
         const activeModules: string[] = ['<g id="active-modules">'];
         const inactiveModules: string[] = ['<g id="inactive-modules">'];
@@ -84,9 +86,9 @@ export class Drawer {
 
         const svgContent: string[] = [];
 
-        let posRow = padding;
-        let posCol = padding;
-        svgContent.push(`<rect width="${svgSize}" height="${svgSize}" fill="url(#background-gradient)"/>`);
+        let posRow = sideSkip;
+        let posCol = sideSkip;
+        svgContent.push(`<rect x="${margin}" y="${margin}" width="${matrixSize}" height="${matrixSize}" fill="url(#background-gradient)"/>`);
         for (const row of matrix.data) {
             for (const bit of row) {
                 const toPush = bit < 0
@@ -104,7 +106,7 @@ export class Drawer {
                 ].join(' '));
                 posCol += style.moduleSize;
             }
-            posCol = padding;
+            posCol = sideSkip;
             posRow += style.moduleSize;
         }
         activeModules.push('</g>');
