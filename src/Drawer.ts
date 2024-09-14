@@ -76,7 +76,7 @@ export class Drawer {
         const style = this.style;
         const svgSize = style.totalSize;
         const pointSize = style.moduleSize - style.moduleMargin;
-        const padding = style.moduleMargin / 2
+        const padding = style.padding + (style.moduleMargin / 2);
 
         const activeModules: string[] = ['<g id="active-modules">'];
         const inactiveModules: string[] = ['<g id="inactive-modules">'];

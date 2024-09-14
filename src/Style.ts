@@ -1,6 +1,6 @@
 export class Style {
     public readonly moduleSize: number;
-    public readonly totalSize: number;
+    public totalSize: number;
     private _moduleRadius: number = 0;
     private _moduleMargin: number = 0;
     private _padding: number = 0;
@@ -12,6 +12,14 @@ export class Style {
     ) {
         this.moduleSize = 100;
         this.totalSize = matrixSideSize * this.moduleSize;
+    }
+    public set padding(padding: Style.SizeValue) {
+        if (typeof padding === 'number') padding = padding *= this.moduleSize;
+        this._padding = Style.parseSizeValue(padding, this.totalSize);
+        this.totalSize += this.padding * 2;
+    }
+    public get padding(): number {
+        return this._padding;
     }
     public get moduleRadius(): number {
         return this._moduleRadius;

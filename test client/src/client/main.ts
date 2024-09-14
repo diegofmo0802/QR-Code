@@ -28,19 +28,20 @@ async function generate() {
         // drawer.debugMode = true;
         const style = drawer.style;
         style.moduleRadius = "50%";
-        style.moduleMargin = "100%";
+        style.moduleMargin = "4%";
+        style.padding = "50%";
         style.background = {
-            colors: ['#DCFFB4', '#DCFFB4', "#FFB4DC", "#00B4FF", "#B4DCFF"],
+            colors: ['#DCFFB4', '#DCFFB4', "#FFB4DC", "#B4DCFF"],
             percentages: [0, 25, 50, 75, 76],
             type: 'radial'
         };
         style.inactiveColor = {
             type: 'linear',
-            colors: ['#FFB4DC', "#DCFFB4", "#B4DCFF"]
+            colors: ['#FFB4DC', "#FFFFFF", "#B4DCFF"]
         };
         style.activeColor = {
             type: 'radial',
-            colors: ['#FF0000', "#000000", "#000088"]
+            colors: ['#FF0000', "#000088"]
         };
         await drawer.addImage('./assets/Logo.svg');
         img.src = await drawer.dataUrl(400);
