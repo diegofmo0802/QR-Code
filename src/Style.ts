@@ -1,22 +1,35 @@
 export class Style {
     public readonly moduleSize: number;
-    public totalSize: number;
+    public readonly matrixSize: number;
     private _moduleRadius: number = 0;
     private _moduleMargin: number = 0;
     private _padding: number = 0;
+    private _margin: number = 0;
     private _background: Style.gradient = Style.parseColor('#00B4FF');
     private _activeColor: Style.gradient = Style.parseColor('#000000');
     private _inactiveColor: Style.gradient = Style.parseColor('#FFFFFF');
     public constructor(
-        private readonly matrixSideSize: number,
+        private readonly matrixSideModules: number,
     ) {
         this.moduleSize = 100;
-        this.totalSize = matrixSideSize * this.moduleSize;
+        this.matrixSize = matrixSideModules * this.moduleSize;
+    }
+    public get totalSize(): number {
+        let totalSize = this.matrixSize;
+        totalSize += this.padding * 2;
+        totalSize += this.margin * 2;
+        return totalSize;
+    }
+    public set margin(margin: Style.SizeValue) {
+        if (typeof margin === 'number') margin = margin *= this.moduleSize;
+        this._margin = Style.parseSizeValue(margin, this.matrixSize);
+    }
+    public get margin(): number {
+        return this._margin;
     }
     public set padding(padding: Style.SizeValue) {
         if (typeof padding === 'number') padding = padding *= this.moduleSize;
-        this._padding = Style.parseSizeValue(padding, this.totalSize);
-        this.totalSize += this.padding * 2;
+        this._padding = Style.parseSizeValue(padding, this.matrixSize);
     }
     public get padding(): number {
         return this._padding;
@@ -74,6 +87,11 @@ export class Style {
         if (typeof value !== 'number' || isNaN(value)) return 0;
         return maximum && value > maximum ? maximum : value;
     }
+    /**
+     * Parse a color to a gradient
+     * @param color Color to parse
+     * @returns Parsed color
+     */
     public static parseColor(color: Style.ColorValue | Style.gradientOptions): Style.gradient {
         if (typeof color === 'string') return {
             type: 'linear',
@@ -127,13 +145,11 @@ export class Style {
             `#inactive-modules { fill: url(#inactive-gradient); }`,
             `#background { fill: url(#background-gradient); }`,
         ].join('');
-
         const svGradients = [
             Style.generateGradient('active-gradient', style.activeColor),
             Style.generateGradient('inactive-gradient', style.inactiveColor),
             Style.generateGradient('background-gradient', style.background),
         ].join('\n');
-
         const svgContent = [
             `<style>${svgStyles}</style>`,
             `<defs>${svGradients}</defs>`
