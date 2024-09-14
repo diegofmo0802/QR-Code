@@ -29,11 +29,13 @@ async function generate() {
         const style = drawer.style;
         style.moduleRadius = "50%";
         style.moduleMargin = "4%";
-        style.padding = "50%";
+        style.padding = '50%';
+        style.margin = '10%';
         style.background = {
-            colors: ['#DCFFB4', '#DCFFB4', "#FFB4DC", "#B4DCFF"],
-            percentages: [0, 25, 50, 75, 76],
-            type: 'radial'
+            colors: ["#F00", '#FFB4DC', '#B4DCFF', '#000'],
+            percentages: [0, 1, 99, 100],
+            type: 'linear',
+            direction: 0,
         };
         style.inactiveColor = {
             type: 'linear',

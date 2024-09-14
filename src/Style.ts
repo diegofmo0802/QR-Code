@@ -96,44 +96,76 @@ export class Style {
         if (typeof color === 'string') return {
             type: 'linear',
             colors: [color],
-            direction: '0deg',
+            direction: 0,
             percentages: [0, 100],
         };
         if (color.type === 'linear') {
             return {
                 type: 'linear',
                 colors: color.colors,
-                direction: color.direction || '0deg',
-                percentages: color.percentages || color.colors.map((_, index, array) => (index / (array.length - 1)) * 100),
+                direction: color.direction != null ? color.direction : 0,
+                percentages: color.percentages != null ? color.percentages : color.colors.map((_, index, array) => (index / (array.length - 1)) * 100),
             };
         } else {
             return {
                 type: 'radial',
                 colors: color.colors,
-                percentages: color.percentages || color.colors.map((_, index, array) => (index / (array.length - 1)) * 100),
-                dx: color.dx || 50,
-                dy: color.dy || 50,
-                r: color.r || 50,
+                percentages: color.percentages != null ? color.percentages : color.colors.map((_, index, array) => (index / (array.length - 1)) * 100),
+                cx: color.cx != null ? color.cx : 50,
+                cy: color.cy != null ? color.cy : 50,
+                r: color.r != null ? color.r : 50,
             };
         }
     }
-    private static generateGradient(id: string, gradient: Style.gradient): string {
+    /**
+     * Generate a gradient
+     * @param id ID of the gradient
+     * @param gradient Gradient to generate
+     * @returns SVG gradient
+     */
+    private static generateGradient(id: string, gradient: Style.gradient, size: number, margin: number = 0): string {
         const type = gradient.type === 'radial' ? 'radialGradient' : 'linearGradient';
-        const direction = gradient.type === 'linear' 
-        ? `gradientTransform="rotate(${(gradient).direction || '0deg'})"`
-        : '';
-        const parameters = gradient.type === 'radial' ? [
-            `cx="${gradient.dx}%"`, `cy="${gradient.dy}%"`, `r="${gradient.r}%"`,
-        ] : [
-            `x1="0%"`, `y1="0%"`, `x2="100%"`, `y2="100%"`,
-        ]
+        const center = size / 2;
+        const gradientSize = size - (margin * 2);
+        const parameters: string[] = [];
+        if (gradient.type === 'linear') {
+            const { x: x1, y: y1 } = Style.calculateBorderPosition(gradientSize, gradient.direction + 180);
+            const { x: x2, y: y2 } = Style.calculateBorderPosition(gradientSize, gradient.direction);
+            parameters.push(
+                `x1="${x1 + center}"`,
+                `y1="${y1 + center}"`,
+                `x2="${x2 + center}"`,
+                `y2="${y2 + center}"`
+            );
+        } else if (gradient.type === 'radial') {
+            const marginPer = (margin / size) * 100;
+            const gradientUnit = (gradientSize) / 100;
+            const cx = (gradientUnit * gradient.cx) + margin;
+            const cy = (gradientUnit * gradient.cy) + margin;
+            const r = gradient.r - marginPer;
+            parameters.push(`cx="${cx}"`, `cy="${cy}"`, `r="${r}%"`);
+        }
         const percentages = gradient.percentages || gradient.colors.map((_, index, array) => (index / (array.length - 1)) * 100);
-        console.log(percentages);
         const colors = gradient.colors.map((color, index) => {
             const offset = percentages[index] || (index / (gradient.colors.length - 1)) * 100;
             return `<stop offset="${offset}%" stop-color="${color}" />`;
         });
-        return `<${type} id="${id}" ${parameters.join(' ')} ${direction} gradientUnits="userSpaceOnUse">${colors.join('')}</${type}>`;
+        return `<${type} id="${id}" ${parameters.join(' ')} gradientUnits="userSpaceOnUse">${colors.join('')}</${type}>`;
+    }
+    /**
+     * Calculate the position of the border of the gradient
+     * @param size Size of the gradient
+     * @param angle Angle of the gradient
+     * @returns Position of the border
+     */
+    private static calculateBorderPosition(size: number, angle: number): { x: number, y: number } {
+        const radians = angle * Math.PI / 180;
+        const xPrime = Math.cos(radians);
+        const yPrime = Math.sin(radians);
+        const k = (size / 2) / Math.max(Math.abs(xPrime), Math.abs(yPrime));
+        const x = k * xPrime;
+        const y = k * yPrime;
+        return { x, y };
     }
     /**
      * Draw the styles of the QR code
@@ -146,9 +178,9 @@ export class Style {
             `#background { fill: url(#background-gradient); }`,
         ].join('');
         const svGradients = [
-            Style.generateGradient('active-gradient', style.activeColor),
-            Style.generateGradient('inactive-gradient', style.inactiveColor),
-            Style.generateGradient('background-gradient', style.background),
+            Style.generateGradient('active-gradient', style.activeColor, style.totalSize, style.margin),
+            Style.generateGradient('inactive-gradient', style.inactiveColor, style.totalSize, style.margin),
+            Style.generateGradient('background-gradient', style.background, style.totalSize, style.margin),
         ].join('\n');
         const svgContent = [
             `<style>${svgStyles}</style>`,
@@ -163,20 +195,25 @@ export namespace Style {
     export type SizeValue = number | `${number}%` | `${number}px`;
     export type ColorValue = `#${string}`;
     export namespace Gradient {
-
         export interface Options {
             type?: 'linear' | 'radial',
+            /** Array of colors in Hex format */
             colors: color[],
+            /** Array of percentages 0-100 */
             percentages?: number[],
         }
         export interface LinearOptions extends Options {
             type: 'linear',
-            direction?: `${number}deg`,
+            /** value 0-365 default 0 */
+            direction?: number,
         }
         export interface RadialOptions extends Options {
             type: 'radial',
-            dx?: number,
-            dy?: number,
+            /** value 0-100 default 50 */
+            cx?: number,
+            /** value 0-100 default 50 */
+            cy?: number,
+            /** value 0-100 default 50 */
             r?: number,
         }
     }
