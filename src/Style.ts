@@ -68,6 +68,15 @@ export class Style {
     public set inactiveColor(inactiveColor: Style.ColorValue | Style.gradientOptions) {
         this._inactiveColor = Style.parseColor(inactiveColor);
     }
+    public setStyles(styles: Style.Styles) {
+        if (styles.moduleRadius != null) this.moduleRadius = styles.moduleRadius;
+        if (styles.moduleMargin != null) this.moduleMargin = styles.moduleMargin;
+        if (styles.padding != null) this.padding = styles.padding;
+        if (styles.margin != null) this.margin = styles.margin;
+        if (styles.background != null) this.background = styles.background;
+        if (styles.activeColor != null) this.activeColor = styles.activeColor;
+        if (styles.inactiveColor != null) this.inactiveColor = styles.inactiveColor;
+    }
     /**
      * Parse a value to a number
      * - if the value is a number, it is returned as is
@@ -194,6 +203,15 @@ export namespace Style {
     export type color = `#${string}`;
     export type SizeValue = number | `${number}%` | `${number}px`;
     export type ColorValue = `#${string}`;
+    export interface Styles {
+        moduleRadius?: number;
+        moduleMargin?: number;
+        padding?: number;
+        margin?: number;
+        background?: color | gradientOptions;
+        activeColor?: color | gradientOptions;
+        inactiveColor?: color | gradientOptions;
+    }
     export namespace Gradient {
         export interface Options {
             type?: 'linear' | 'radial',
