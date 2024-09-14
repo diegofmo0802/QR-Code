@@ -26,12 +26,24 @@ async function generate() {
         const drawer = qr.imageDrawer;
         if (!drawer) throw new Error('No image drawer');
         // drawer.debugMode = true;
-        drawer.size = 250;
-        drawer.moduleRadius = 0//"50%";
-        drawer.moduleMargin = 0;
-        drawer.backgroundColor = '#FFB4DC';
+        const style = drawer.style;
+        style.moduleRadius = "50%";
+        style.moduleMargin = "100%";
+        style.background = {
+            colors: ['#DCFFB4', '#DCFFB4', "#FFB4DC", "#00B4FF", "#B4DCFF"],
+            percentages: [0, 25, 50, 75, 76],
+            type: 'radial'
+        };
+        style.inactiveColor = {
+            type: 'linear',
+            colors: ['#FFB4DC', "#DCFFB4", "#B4DCFF"]
+        };
+        style.activeColor = {
+            type: 'radial',
+            colors: ['#FF0000', "#000000", "#000088"]
+        };
         await drawer.addImage('./assets/Logo.svg');
-        img.src = await drawer.dataUrl();
+        img.src = await drawer.dataUrl(400);
         console.log('QR code displayed');
     } catch (e) {
         console.error('Error generating QR code:', e);
