@@ -38,15 +38,32 @@ export class Drawer {
         ) throw new Error('Drawer is only allowed in browser');
         return new Drawer(qr);
     }
+    /**
+     * Get the debug mode
+     * @returns Debug mode
+     */
     public get debugMode(): boolean {
         return this.qr.debugMode;
     }
+    /**
+     * Set the debug mode
+     * @param mode Debug mode
+     */
     public set debugMode(mode: boolean) {
         this.qr.debugMode = mode
     }
+    /**
+     * Get the SVG of the QR code
+     * @returns SVG of the QR code
+     */
     public get svg(): string {
         return this.draw();
     }
+    /**
+     * Get the data URL of the QR code
+     * @param size Size of the image
+     * @returns Promise that resolves when the image is loaded
+     */
     public async dataUrl(size?: number): Promise<string> {
         size = size || this.style.totalSize;
         const svg = this.draw();
@@ -58,7 +75,11 @@ export class Drawer {
         await this.drawSvg(ctx, svg, 0, 0, size, size);
         return canvas.toDataURL();
     }
-    public draw(): string {
+    /**
+     * Draw the QR code
+     * @returns SVG of the QR code
+     */
+    private draw(): string {
         const style = this.style;
         const svgStyles = Style.drawStyles(style);
         const svgMatrix = this.drawMatrix(this.qr.QRMatrix);
@@ -120,7 +141,7 @@ export class Drawer {
      * @param ctx Canvas context
      * @param image Image to draw
      */
-    public drawIcon(image: string): string {
+    private drawIcon(image: string): string {
         const style = this.style;
         const qrArea = this.qr.QRMatrix.maxBitsData;
         const iconArea = Math.floor(qrArea * 0.15);
@@ -156,16 +177,15 @@ export class Drawer {
         img.src = url;
         await new Promise((resolve, reject) => {
             img.onerror = (e) => {
-                reject(new Error('Error drawing SVG: ' + `\`${url}\``));
+                reject(new Error('Error drawing SVG'));
             };
             img.onload = () => {
                 ctx.drawImage(img, x, y, width, height);
                 resolve(true);
             };
         });
-        // URL.revokeObjectURL(url);
+        URL.revokeObjectURL(url);
     }
-
     /**
      * Add an image to the QR code
      * @param url URL of the image
@@ -195,6 +215,13 @@ export class Drawer {
             reader.readAsDataURL(blob);
         });
     }
+    /**
+     * Generate an SVG
+     * @param width Width of the SVG
+     * @param height Height of the SVG
+     * @param content Content of the SVG
+     * @returns SVG
+     */
     public static generateSvg(width: number, height: number, content: string): string {
         const svgNamespace = "http://www.w3.org/2000/svg";
         const svgXlinkNamespace = "http://www.w3.org/1999/xlink";
