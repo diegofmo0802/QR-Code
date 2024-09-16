@@ -71,8 +71,7 @@ export class QR {
      * @returns Data URL of the QR code if you are in a browser, null otherwise
      */
     public get imageDrawer(): Drawer | null {
-        try { return Drawer.create(this); }
-        catch { return null; }
+        return Drawer.create(this);
     }
     /**
      * Get the QR matrix

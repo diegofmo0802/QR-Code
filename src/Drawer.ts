@@ -2,6 +2,13 @@ import Style from "./Style.js";
 import Matrix from "./Matrix.js";
 import QR from "./QR.js";
 
+export const isBrowser = !(
+    typeof window === 'undefined' ||
+    typeof document === 'undefined' ||
+    typeof HTMLCanvasElement === 'undefined' ||
+    typeof HTMLImageElement === 'undefined'
+);
+
 export class Drawer {
     public readonly style: Style;
     private icon: string | null = null;
@@ -30,12 +37,6 @@ export class Drawer {
      *  document.body.appendChild(img);
      */
     public static create(qr: QR): Drawer {
-        if (
-            typeof window === 'undefined' ||
-            typeof document === 'undefined' ||
-            typeof HTMLCanvasElement === 'undefined' ||
-            typeof HTMLImageElement === 'undefined'
-        ) throw new Error('Drawer is only allowed in browser');
         return new Drawer(qr);
     }
     /**
@@ -58,22 +59,6 @@ export class Drawer {
      */
     public get svg(): string {
         return this.draw();
-    }
-    /**
-     * Get the data URL of the QR code
-     * @param size Size of the image
-     * @returns Promise that resolves when the image is loaded
-     */
-    public async dataUrl(size?: number): Promise<string> {
-        size = size || this.style.totalSize;
-        const svg = this.draw();
-        const canvas = document.createElement('canvas');
-        canvas.width = size;
-        canvas.height = size;
-        const ctx = canvas.getContext('2d');
-        if (!ctx) throw new Error('Canvas context not found');
-        await this.drawSvg(ctx, svg, 0, 0, size, size);
-        return canvas.toDataURL();
     }
     /**
      * Draw the QR code
@@ -154,9 +139,90 @@ export class Drawer {
         
         const svgContent = [
             `<rect stroke="black" stroke-width="${border / 2}" x="${centerOffset}" y="${centerOffset}" width="${iconSize}" height="${iconSize}" fill="url(#background-gradient)"/>`,
-            `<image x="${centerOffset}" y="${centerOffset}" fill="red" width="${iconSize}" xlink:height="${iconSize}" href="${image}" />`
+            `<image class="icon" x="${centerOffset}" y="${centerOffset}" width="${iconSize}" height="${iconSize}" preserveAspectRatio="xMidYMid slice" href="${image}" />`
         ].join(' ');
         return svgContent;
+    }
+    /**
+     * Generate an SVG
+     * @param width Width of the SVG
+     * @param height Height of the SVG
+     * @param content Content of the SVG
+     * @returns SVG
+     */
+    public static generateSvg(width: number, height: number, content: string): string {
+        const svgNamespace = "http://www.w3.org/2000/svg";
+        // const svgXlinkNamespace = "http://www.w3.org/1999/xlink";
+        const svgVersion = "1.1";
+        let svgContent = [
+            '<svg',
+            // 'style="shape-rendering: crispEdges"',
+            `xmlns="${svgNamespace}"`,
+            // `xmlns:xlink="${svgXlinkNamespace}"`,
+            `version="${svgVersion}"`,
+            `width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`,
+            content,
+            '</svg>'
+        ].join(' ');
+        return svgContent;
+    }
+    // Methods to browser
+    /**
+     * only in browser
+     * Get the data URL of the QR code
+     * @param size Size of the image
+     * @returns Promise that resolves when the image is loaded
+     * @throws Error if not in browser
+     * @example
+     *  const source = await qr.dataUrl;
+     *  const img = new Image();
+     *  img.src = source;
+     *  document.body.appendChild(img);
+     */
+    public async dataUrl(size?: number): Promise<string> {
+        if (!isBrowser) throw new Error('Not in browser');
+        size = size || this.style.totalSize;
+        const svg = this.draw();
+        const canvas = document.createElement('canvas');
+        canvas.width = size;
+        canvas.height = size;
+        const ctx = canvas.getContext('2d');
+        if (!ctx) throw new Error('Canvas context not found');
+        await this.drawSvg(ctx, svg, 0, 0, size, size);
+        return canvas.toDataURL();
+    }
+    /**
+     * Add an image to the QR code
+     * @param url URL of the image
+     * @returns Promise that resolves when the image is added
+     * @example await qr.addImage('https://example.com/image.png');
+     * @example await qr.addImage('./image.png');
+     */
+    public async addImage(url: string): Promise<void> {
+        if (!isBrowser) throw new Error('Not in browser');
+        const dataUrl = await this.loadImage(url);
+        this.icon = dataUrl;
+    }
+    /**
+     * only in browser
+     * Load an image from a URL
+     * @param src URL of the image
+     * @returns Promise that resolves when the image is loaded
+     * @throws Error if not in browser
+     */
+    private async loadImage(src: string): Promise<string> {
+        if (!isBrowser) throw new Error('Not in browser');
+        const rs = await fetch(src);
+        const blob = await rs.blob();
+        const reader = new FileReader();
+        return await new Promise((resolve, reject) => {
+            reader.onload = () => resolve(reader.result as string);
+            reader.onerror = () => {
+                reject(new Error('Error loading image'));
+                console.error('Error loading image:', reader.error);
+            };
+            reader.readAsDataURL(blob);
+        });
     }
     /**
      * Draw an SVG on the canvas
@@ -171,8 +237,10 @@ export class Drawer {
         ctx: CanvasRenderingContext2D, svg: string,
         x: number, y: number, width: number, height: number
     ): Promise<void> {
-        const svgBlob = new Blob([svg], { type: 'image/svg+xml' });
-        const url = URL.createObjectURL(svgBlob);
+        if (!isBrowser) throw new Error('Not in browser');
+        // const svgBlob = new Blob([svg], { type: 'image/svg+xml' });
+        // const url = URL.createObjectURL(svgBlob);
+        const url = `data:image/svg+xml;charset=utf-8,${encodeURIComponent(svg)}`;
         const img = new Image();
         img.src = url;
         await new Promise((resolve, reject) => {
@@ -184,59 +252,7 @@ export class Drawer {
                 resolve(true);
             };
         });
-        URL.revokeObjectURL(url);
-    }
-    /**
-     * Add an image to the QR code
-     * @param url URL of the image
-     * @returns Promise that resolves when the image is added
-     * @example await qr.addImage('https://example.com/image.png');
-     * @example await qr.addImage('./image.png');
-     */
-    public async addImage(url: string): Promise<void> {
-        const dataUrl = await this.loadImage(url);
-        this.icon = dataUrl;
-    }
-    /**
-     * Load an image from a URL
-     * @param src URL of the image
-     * @returns Promise that resolves when the image is loaded
-     */
-    private async loadImage(src: string): Promise<string> {
-        const rs = await fetch(src);
-        const blob = await rs.blob();
-        const reader = new FileReader();
-        return await new Promise((resolve, reject) => {
-            reader.onload = () => resolve(reader.result as string);
-            reader.onerror = () => {
-                reject(new Error('Error loading image'));
-                console.error('Error loading image:', reader.error);
-            };
-            reader.readAsDataURL(blob);
-        });
-    }
-    /**
-     * Generate an SVG
-     * @param width Width of the SVG
-     * @param height Height of the SVG
-     * @param content Content of the SVG
-     * @returns SVG
-     */
-    public static generateSvg(width: number, height: number, content: string): string {
-        const svgNamespace = "http://www.w3.org/2000/svg";
-        const svgXlinkNamespace = "http://www.w3.org/1999/xlink";
-        const svgVersion = "1.1";
-        let svgContent = [
-            '<svg',
-            // 'style="shape-rendering: crispEdges"',
-            `xmlns="${svgNamespace}"`,
-            `xmlns:xlink="${svgXlinkNamespace}"`,
-            `version="${svgVersion}"`,
-            `width="${width}" height="${height}" viewBox="0 0 ${width} ${height}">`,
-            content,
-            '</svg>'
-        ].join(' ');
-        return svgContent;
+        // URL.revokeObjectURL(url);
     }
 }
 
