@@ -70,7 +70,7 @@ export class QR {
      * Get the data URL of the QR code
      * @returns Data URL of the QR code if you are in a browser, null otherwise
      */
-    public get imageDrawer(): Drawer | null {
+    public get imageDrawer(): Drawer {
         return Drawer.create(this);
     }
     /**
